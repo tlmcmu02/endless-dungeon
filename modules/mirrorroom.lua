@@ -30,8 +30,13 @@ function love.load()
   cooldown = 0
   animtimer = 0
   bhp = 1
-  rx = 464
-  ry = 536
+  rx = 600
+  ry = 300
+  faceleft = rx - mirrorx
+  faceright = mirrorx - rx
+  facedown = y - ry
+  faceup = ry - y 
+  state = idle
 
   spritesheet = love.graphics.newImage('hero/Old heroT.png')
   grid = anim8.newGrid(64, 64, spritesheet:getWidth(), spritesheet:getHeight())
@@ -46,8 +51,6 @@ function love.load()
   walkm = anim8.newAnimation(grid('1-6', 2), 0.1)
   idlem = anim8.newAnimation(grid('1-4', 1), 0.4)
   kickm = anim8.newAnimation(grid('3-3', 3), 0.4)
-
-  anim = idlem
 
   bannanaspritesheet = love.graphics.newImage('assets-1/enemies/bannana.png')
   grid = anim8.newGrid(64, 64, spritesheet:getWidth(), spritesheet:getHeight())
@@ -203,6 +206,10 @@ function love.load()
 end
   
 function love.update(dt)
+  faceleft = rx - mirrorx
+  faceright = mirrorx - rx
+  facedown = y - ry
+  faceup = ry - y 
   if love.keyboard.isDown('x') then   -- if the 'x' key is being pressed...
       if cooldown == 0 then
         kick:update(dt)
@@ -306,11 +313,7 @@ function love.update(dt)
       end
     end
   end
-  if cc(x, y, w, h, 344, 510, 64, 64) then
-    if mirrorshatttered == false then
-        mirrorshatttered = true
-    end
-  end
+
   if cc(x, y, w, h, 60, 542, 99, 84) then
     if Iframes == 0 then
       hpnum = hpnum - 1
@@ -417,18 +420,61 @@ function love.update(dt)
   idle:update(dt)
   idle1:update(dt)
   idle2:update(dt)
+
   if mirrorx > bx then
   bx = bx + 2
   end
   if mirrorx < bx then
     bx = bx - 2
-    end
+  end
   if y > by then
   by = by + 2
   end
   if y < by then
     by = by - 2
   end
+
+  --if faceleft < facedown or faceright < facedown then
+  --  state = rollingdown 
+  --end
+ --if faceleft > facedown then
+ --  state = rollingleft
+ --end
+ --if faceright > facedown then
+ --  state = rollingright
+ --end
+
+  if faceleft < faceup then
+    if faceright < faceup then
+      state = rollingup
+    end
+  end
+
+  if faceleft > faceup then
+    state = rollingleft
+  end
+
+  if faceright > faceup then
+    state = rollingright
+  end
+
+
+  --if state == rollingdown then
+  --  ry = ry + 7
+  --end
+
+  if state == rollingup then
+    ry = ry - 7
+  end
+
+  if state == rollingright then
+    rx = rx + 7
+  end
+
+  --if state == rollingleft then
+  --  rx = rx - 7
+  --end
+
   cam:setPosition(x, y)
 end
 
@@ -557,6 +603,21 @@ if timerIFrames == 1 or timerIFrames == 2 or timerIFrames == 3 or timerIFrames =
     end
   end
 end
+
+love.graphics.print('facedown', x - 20, y - 20)
+love.graphics.print('faceup', x - 20, y - 30)
+love.graphics.print('faceright', x - 20, y - 40)
+love.graphics.print('faceleft', x - 20, y - 50)
+love.graphics.print(facedown, x + 50, y - 20)
+love.graphics.print(faceup, x + 50, y - 30)
+love.graphics.print(faceright, x + 50, y - 40)
+love.graphics.print(faceleft, x + 50, y - 50)
+love.graphics.print(x, x - 20, y - 60)
+love.graphics.print(y, x - 20, y - 70)
+love.graphics.print(mirrorx, x - 20, y - 80)
+love.graphics.print(mirrory, x - 20, y - 90)
+--love.graphics.print(state, x - 20, y - 100)
+
 
   if lives == 3 then
     love.graphics.draw(Lifecount3, 50, 52)
