@@ -30,13 +30,14 @@ function love.load()
   cooldown = 0
   animtimer = 0
   bhp = 1
+  rhp = 30
   rx = 600
   ry = 300
   faceleft = rx - mirrorx
   faceright = mirrorx - rx
   facedown = y - ry
   faceup = ry - y 
-  state = idle
+  state = 'idle'
 
   spritesheet = love.graphics.newImage('hero/Old heroT.png')
   grid = anim8.newGrid(64, 64, spritesheet:getWidth(), spritesheet:getHeight())
@@ -434,46 +435,65 @@ function love.update(dt)
     by = by - 2
   end
 
-  --if faceleft < facedown or faceright < facedown then
-  --  state = rollingdown 
-  --end
- --if faceleft > facedown then
- --  state = rollingleft
- --end
- --if faceright > facedown then
- --  state = rollingright
- --end
-
-  if faceleft < faceup then
-    if faceright < faceup then
-      state = rollingup
+  if state == 'idle' then
+    if faceleft < facedown or faceright < facedown then
+      state = 'rollingdown' 
+    end
+    if faceleft > facedown then
+      state = 'rollingleft'
+    end
+    if faceright > facedown then
+      state = 'rollingright'
+    end
+    if faceleft < faceup then
+      if faceright < faceup then
+        state = 'rollingup'
+      end
+    end
+    if faceleft > faceup then
+      state = 'rollingleft'
+    end
+    if faceright > faceup then
+      state = 'rollingright'
     end
   end
 
-  if faceleft > faceup then
-    state = rollingleft
+
+  if state == 'rollingdown' then
+    if walls:cc(rx, ry + 7, 64, 64) == false then
+      ry = ry + 7
+      r1 = 1
+      r2 = 1
+      state = 'preidle'
+    end
   end
 
-  if faceright > faceup then
-    state = rollingright
+  if state == 'rollingleft' then
+    if walls:cc(rx - 7, ry, 64, 64) == false then
+      rx = rx - 7
+      r1 = -1
+      r2 = 1
+      state = 'preidle'
+    end
+  end
+  if state == 'rollingup' then
+    if mirror:cc(rx, ry - 7, 64, 64) == false then
+      ry = ry - 7
+      r1 = 1
+      r2 = -1
+      state = 'preidle'
+    end
   end
 
-
-  --if state == rollingdown then
-  --  ry = ry + 7
-  --end
-
-  if state == rollingup then
-    ry = ry - 7
+  if state == 'rollingright' then
+    if walls:cc(rx + 7, ry, 64, 64) == false then
+      rx = rx + 7
+      r1 = 1
+      r2 = -1
+      state = 'preidle'
+    end
   end
 
-  if state == rollingright then
-    rx = rx + 7
-  end
-
-  --if state == rollingleft then
-  --  rx = rx - 7
-  --end
 
   cam:setPosition(x, y)
 end
@@ -531,7 +551,9 @@ function love.draw()
 if bhp == 1 then
   idle1:draw(bannanaspritesheet, bx, by)
 end
-  idle2:draw(rollinspritesheet, rx, ry)
+if rhp > 0 then
+  idle2:draw(rollinspritesheet, rx, ry, rotation, r1, r2)
+end
 
 if timerIFrames == 1 or timerIFrames == 2 or timerIFrames == 3 or timerIFrames == 4 or timerIFrames == 5 or timerIFrames == 6 or timerIFrames == 7 or timerIFrames == 8 or timerIFrames == 9 or timerIFrames == 10 or timerIFrames == 11 or timerIFrames == 12 or timerIFrames == 13 or timerIFrames == 14 or timerIFrames == 15 or timerIFrames == 16 or timerIFrames == 17 or timerIFrames == 21 or timerIFrames == 22 or timerIFrames == 23 or timerIFrames == 24 or timerIFrames == 25 or timerIFrames == 26 or timerIFrames == 27 or timerIFrames == 28 or timerIFrames == 29 or timerIFrames == 30 or timerIFrames == 31 or timerIFrames == 32 or timerIFrames == 33 or timerIFrames == 34 or timerIFrames == 35 or timerIFrames == 36 or timerIFrames == 37 or timerIFrames == 40 or timerIFrames == 41 or timerIFrames == 42 or timerIFrames == 43 or timerIFrames == 44 or timerIFrames == 45 or timerIFrames == 46 or timerIFrames == 47 or timerIFrames == 48 or timerIFrames == 49 or timerIFrames == 50 or timerIFrames == 51 or timerIFrames == 52 or timerIFrames == 53 or timerIFrames == 54 or timerIFrames == 55 or timerIFrames == 56 or timerIFrames == 57 or timerIFrames == 0 then
   if anim == idle then
