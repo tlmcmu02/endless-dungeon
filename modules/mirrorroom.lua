@@ -37,6 +37,7 @@ function love.load()
   faceright = mirrorx - rx
   facedown = y - ry
   faceup = ry - y 
+  bumptime = 0
   state = 'idle'
 
   spritesheet = love.graphics.newImage('hero/Old heroT.png')
@@ -436,8 +437,10 @@ function love.update(dt)
   end
 
   if state == 'idle' then
-    if faceleft < facedown or faceright < facedown then
-      state = 'rollingdown' 
+    if faceleft < facedown then
+      if faceright < facedown then
+        state = 'rollingdown' 
+      end
     end
     if faceleft > facedown then
       state = 'rollingleft'
@@ -460,40 +463,58 @@ function love.update(dt)
 
 
   if state == 'rollingdown' then
-    if walls:cc(rx, ry + 7, 64, 64) == false then
+    if walls:cc(rx, ry + 1, 64, 64) == false then
       ry = ry + 7
       r1 = 1
       r2 = 1
-      state = 'preidle'
+      if walls:cc(rx, ry + 7, 64, 64) then
+        state = 'preidle'
+      end
     end
   end
 
   if state == 'rollingleft' then
-    if walls:cc(rx - 7, ry, 64, 64) == false then
+    if walls:cc(rx - 1, ry, 64, 64) == false then
       rx = rx - 7
       r1 = -1
       r2 = 1
-      state = 'preidle'
+      if walls:cc(rx - 7, ry, 64, 64) then
+        state = 'preidle'
+      end
     end
   end
+
   if state == 'rollingup' then
-    if mirror:cc(rx, ry - 7, 64, 64) == false then
+    if mirror:cc(rx, ry - 1, 64, 64) == false then
       ry = ry - 7
       r1 = 1
       r2 = -1
-      state = 'preidle'
+      if walls:cc(rx, ry - 7, 64, 64) then
+        state = 'preidle'
+      end
     end
   end
 
   if state == 'rollingright' then
-    if walls:cc(rx + 7, ry, 64, 64) == false then
+    if walls:cc(rx + 1, ry, 64, 64) == false then
       rx = rx + 7
       r1 = 1
       r2 = -1
-      state = 'preidle'
+      if walls:cc(rx + 7, ry, 64, 64) then
+        state = 'preidle'
+      end
     end
   end
-
+  if state == 'preidle' then
+    bumptime = 30
+  end
+  if bumptime > 0 then
+    bumptime = bumptime - 1
+    state = 'half-idle'
+  end
+  if bumptime == 0 then
+    state = 'idle'
+  end
 
   cam:setPosition(x, y)
 end
@@ -638,7 +659,7 @@ love.graphics.print(x, x - 20, y - 60)
 love.graphics.print(y, x - 20, y - 70)
 love.graphics.print(mirrorx, x - 20, y - 80)
 love.graphics.print(mirrory, x - 20, y - 90)
---love.graphics.print(state, x - 20, y - 100)
+love.graphics.print(state, x - 20, y - 100)
 
 
   if lives == 3 then
